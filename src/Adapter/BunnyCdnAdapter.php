@@ -105,8 +105,7 @@ class BunnyCdnAdapter implements AdapterInterface
 
         $result = $this->getCached($path);
 
-        if (!isset($result[$path])) {
-            $result[$path] = true;
+        if (!isset($result[$path]) && $result[$path] = $this->getHashedContent($path)) {
             $this->cache->save($this->getCacheKey($path), $result);
         }
 
@@ -131,6 +130,9 @@ class BunnyCdnAdapter implements AdapterInterface
      */
     public function update($path, $contents, Config $config)
     {
+        if ($this->has($path) && sha1($contents) === $this->getHashedContent($path)) {
+            return true;
+        }
         $this->delete($path);
 
         return $this->write($path, $contents, $config);
@@ -275,7 +277,7 @@ class BunnyCdnAdapter implements AdapterInterface
 
         $result = $this->getCached($path);
 
-        if (!isset($result[$path]) && $result[$path] = (bool)$this->getSize($path)) {
+        if (!isset($result[$path]) && $result[$path] = $this->getHashedContent($path)) {
             $this->cache->save($this->getCacheKey($path), $result);
         }
 
@@ -314,11 +316,15 @@ class BunnyCdnAdapter implements AdapterInterface
      */
     public function readStream($path)
     {
-        return [
-            'type' => 'file',
-            'path' => $path,
-            'stream' => fopen($this->apiUrl . $path . '?AccessKey=' . $this->apiKey, 'rb'),
-        ];
+        if ($stream = fopen($this->apiUrl . $this->urlencodePath($path) . '?AccessKey=' . $this->apiKey, 'rb')) {
+            return [
+                'type' => 'file',
+                'path' => $path,
+                'stream' => $stream,
+            ];
+        }
+
+        return false;
     }
 
     /**
@@ -491,5 +497,14 @@ class BunnyCdnAdapter implements AdapterInterface
         }
 
         return $result;
+    }
+
+    private function getHashedContent($path)
+    {
+        if ($file = $this->read($path)) {
+            return sha1($file['contents']);
+        }
+
+        return false;
     }
 }
