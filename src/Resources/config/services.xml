@@ -19,5 +19,9 @@
             <argument type="string">%frosh_bunnycdn_media_storage.cache_dir%</argument>
         </service>
 
+        <service id="Frosh\BunnycdnMediaStorage\Entities\BunnydnCacheEntityDefinition">
+            <tag name="shopware.entity.definition" entity="bunnycdn_cache_entity"/>
+        </service>
+
     </services>
 </container>
