@@ -268,13 +268,6 @@ class BunnyCdnAdapter implements AdapterInterface
      */
     public function has($path): bool
     {
-        /*
-         * If path contains '?', it's variable thumbnail. So always correct.
-         */
-        if (mb_strpos($path, '?') !== false) {
-            return true;
-        }
-
         $result = $this->getCached($path);
 
         if (!isset($result[$path]) && $result[$path] = $this->getHashedContent($path)) {
