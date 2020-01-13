@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Swag\CustomEntity\Migration;
+namespace Frosh\BunnycdnMediaStorage\Migration;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;

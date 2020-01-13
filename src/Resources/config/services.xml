@@ -23,5 +23,9 @@
             <tag name="shopware.entity.definition" entity="bunnycdn_cache_entity"/>
         </service>
 
+        <service id="Frosh\BunnycdnMediaStorage\Component\BunnycdnCache">
+            <argument type="service" id="bunnycdn_cache_entity.repository"/>
+        </service>
+
     </services>
 </container>
