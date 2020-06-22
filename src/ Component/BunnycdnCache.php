@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Frosh\BunnycdnMediaStorage\Component;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Exception;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -11,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 
 class BunnycdnCache extends CacheProvider
 {
-
     /**
      * @var EntityRepositoryInterface
      */
@@ -23,7 +21,7 @@ class BunnycdnCache extends CacheProvider
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function doFetch($path)
     {
@@ -35,29 +33,30 @@ class BunnycdnCache extends CacheProvider
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function doContains($path)
+    protected function doContains($path): void
     {
         // TODO: Implement doContains() method.
     }
 
     /**
-     * @inheritDoc
-     * @throws Exception
+     * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     protected function doSave($path, $data, $lifeTime = 0)
     {
         if (!is_array($data)) {
-            throw new Exception('no array given');
+            throw new \Exception('no array given');
         }
 
         if (!isset($data['path'])) {
-            throw new Exception('no path given');
+            throw new \Exception('no path given');
         }
 
         if (!isset($data['hash'])) {
-            throw new Exception('no hash given');
+            throw new \Exception('no hash given');
         }
 
         if (!isset($data['encoder'])) {
@@ -71,25 +70,25 @@ class BunnycdnCache extends CacheProvider
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function doDelete($path)
+    protected function doDelete($path): void
     {
         // TODO: Implement doDelete() method.
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function doFlush()
+    protected function doFlush(): void
     {
         // TODO: Implement doFlush() method.
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function doGetStats()
+    protected function doGetStats(): void
     {
         // TODO: Implement doGetStats() method.
     }

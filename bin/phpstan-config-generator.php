@@ -10,7 +10,7 @@ $classLoader = require __DIR__ . '/../../../../vendor/autoload.php';
 (new Dotenv(true))->load(__DIR__ . '/../../../../.env');
 $shopwareVersion = Versions::getVersion('shopware/platform');
 $pluginRootPath = dirname(__DIR__);
-$composerJson = json_decode((string)file_get_contents($pluginRootPath . '/composer.json'), true);
+$composerJson = json_decode((string) file_get_contents($pluginRootPath . '/composer.json'), true);
 $froshPlatformThumbnailProcessor = [
     'autoload' => $composerJson['autoload'],
     'baseClass' => FroshPlatformThumbnailProcessor::class,

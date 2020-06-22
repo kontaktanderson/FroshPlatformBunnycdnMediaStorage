@@ -34,7 +34,7 @@ class BunnydnCacheEntityDefinition extends EntityDefinition
             (new IdField('id', 'id'))->addFlags(new PrimaryKey(), new Required()),
             new StringField('path', 'path'),
             new StringField('hash', 'hash'),
-            new StringField('encoder', 'encoder')
+            new StringField('encoder', 'encoder'),
         ]);
     }
 }
