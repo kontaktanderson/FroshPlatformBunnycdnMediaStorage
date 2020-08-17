@@ -14,44 +14,50 @@ jobs:
         env:
             DEVELOPMENT_BRANCH: master
             TEST_SUITES: 'administration storefront content framework system'
+            TEST_ENV: ${{ secrets.TESTENV }}
 
         steps:
-            - name: Clone development
-              run: git clone -b $DEVELOPMENT_BRANCH https://github.com/shopware/development.git && cd development && rm -rf platform
+            -   name: Clone development
+                run: git clone -b $DEVELOPMENT_BRANCH https://github.com/shopware/development.git && cd development && rm -rf platform
 
-            - name: Clone platform
-              uses: actions/checkout@v2
-              with:
-                  path: development/platform
+            -   name: Clone platform
+                run: cd development && git clone -b $DEVELOPMENT_BRANCH https://github.com/shopware/platform.git
 
-            - name: Fix platform for composer
-              run: |
-                  cd development/platform
-                  git fetch --prune --unshallow
-                  git checkout master
-                  git checkout -
-                  cd ..
-                  git reset --hard @
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ matrix.php }}
-                  tools: composer, prestissimo
-                  coverage: none
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    tools: composer, prestissimo
+                    coverage: none
 
-            - name: Start MySQL
-              run: ./development/platform/.github/setup-db.sh mysql:5.7
+            -   name: Start MySQL
+                run: ./development/platform/.github/setup-db.sh mysql:5.7
 
-            - name: Install Shopware
-              run: |
-                  echo $TESTENV >> ./development/config/packes/shopware.yml
+            -   name: Install Shopware
+                run: |
+                    cd development
+                    cp platform/.github/.psh.yaml.override .
+                    ./psh.phar init-composer
+                    if [[ ! -h vendor/shopware/platform ]]; then echo 'vendor/shopware/platform should be a symlink'; exit 1; fi
+                    nohup php -S localhost:8000 -t public > phpd.log 2>&1 &
+                    ./psh.phar init
 
-            - name: Install Shopware
-              run: |
-                  cd development
-                  cp platform/.github/.psh.yaml.override .
-                  ./psh.phar init-composer
-                  if [[ ! -h vendor/shopware/platform ]]; then echo 'vendor/shopware/platform should be a symlink'; exit 1; fi
-                  nohup php -S localhost:8000 -t public > phpd.log 2>&1 &
-                  ./psh.phar init
-            - name: Run PHPUnit
-              run: 'cd development; for TEST_SUITE in $TEST_SUITES; do php -d memory_limit=-1 vendor/bin/phpunit --configuration vendor/shopware/platform/phpunit.xml.dist --exclude-group needsWebserver --testsuite "$TEST_SUITE"; done'
+            -   name: Clone plugin
+                uses: actions/checkout@v2
+                with:
+                    path: ./development/custom/plugins/FroshPlatformBunnycdnMediaStorage
+
+            -   name: Install plugin
+                run: |
+                    cd development
+                    bin/console plugin:refresh
+                    bin/console plugin:install --activate FroshPlatformBunnycdnMediaStorage
+                    bin/console cache:clear
+
+            -   name: Write shopware.yml
+                run: |
+                    mkdir ./development/config/packages
+                    echo $TEST_ENV | base64 -d  >> ./development/config/packages/shopware.yml
+                    ls -laih ./development/config/packages
+
+            -   name: Run PHPUnit
+                run: 'cd development; for TEST_SUITE in $TEST_SUITES; do php -d memory_limit=-1 vendor/bin/phpunit --configuration vendor/shopware/platform/phpunit.xml.dist --exclude-group needsWebserver --testsuite "$TEST_SUITE"; done'
