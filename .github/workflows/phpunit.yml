@@ -52,6 +52,7 @@ jobs:
                     bin/console plugin:refresh
                     bin/console plugin:install --activate FroshPlatformBunnycdnMediaStorage
                     rm -rf var/cache/*
+                    bin/console plugin:refresh
 
             -   name: Write shopware.yml
                 run: |
